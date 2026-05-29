@@ -270,14 +270,15 @@ Be conversational, precise, and helpful. Use numbers. If asked about leaving, gi
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          model: "claude-sonnet-4-20250514",
-          max_tokens: 300,
-          system: systemPrompt,
-          messages: newHistory.map(m => ({ role: m.role, content: m.content })),
-        }),
+          messages: [
+            { role: "system", content: systemPrompt },
+            ...newHistory.map(m => ({ role: m.role, content: m.content }))
+          ]
+        })
       });
       const data = await res.json();
-      const reply = data.content?.[0]?.text || "Sorry, I couldn't get a response. Check live data above.";
+      const reply = data.choices?.[0]?.message?.content 
+        || "Could not get a response. Check live data above.";
       setAiMessages([...newHistory, { role: "assistant", content: reply }]);
     } catch (err) {
       // Fallback: compute actionable advice directly from live bus state
