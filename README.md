@@ -87,4 +87,3 @@ Every feature is built around that single decision moment.
 
 ---
 
-Built for the OnRoute Hackathon · Delhi commuters · 4.5M daily DTC riders
