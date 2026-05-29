@@ -266,7 +266,7 @@ Leave-by time: ${leaveInMins !== null ? (leaveInMins <= 0 ? "IMMEDIATELY" : `in 
 Be conversational, precise, and helpful. Use numbers. If asked about leaving, give a clear yes/no + reason.`;
 
     try {
-      const res = await fetch("https://api.anthropic.com/v1/messages", {
+      const res = await fetch("/api/chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -279,8 +279,23 @@ Be conversational, precise, and helpful. Use numbers. If asked about leaving, gi
       const data = await res.json();
       const reply = data.content?.[0]?.text || "Sorry, I couldn't get a response. Check live data above.";
       setAiMessages([...newHistory, { role: "assistant", content: reply }]);
-    } catch {
-      setAiMessages([...newHistory, { role: "assistant", content: "Network error. But based on live data: " + (leaveInMins <= 0 ? "You need to leave NOW!" : `Leave in ${leaveInMins} min for the next bus at ${nextBus ? fmtTime(nextBus.etaMins) : "soon"}.`) }]);
+    } catch (err) {
+      // Fallback: compute actionable advice directly from live bus state
+      const fb = buses[0];
+      const fbLeave = fb ? computeLeaveBy(fb.etaMins, walkMins) : null;
+      const ctx = getTimeContext();
+      const timeLabel = ctx.isRushAM ? "Rush hour AM" : ctx.isRushPM ? "Rush hour PM" : "Off-peak";
+      let fallback = `⚠️ AI advisor offline (${err.message || "network error"}). Here's what the live data says:\n\n`;
+      if (!fb) {
+        fallback += "No bus data available yet. Please wait for the live feed to load.";
+      } else if (fbLeave <= 0) {
+        fallback += `🔴 Leave NOW. Next bus (${fb.vehicleNo}) arrives at ${fmtTime(fb.etaMins)} — you have no time left. It's ${timeLabel}, ${fb.status.toLowerCase()}.`;
+      } else if (fbLeave <= 3) {
+        fallback += `🟠 Leave in ${fbLeave} min. Bus ${fb.vehicleNo} at ${fmtTime(fb.etaMins)} — ${fb.status}, ${fb.confidence}% confidence. Don't delay.`;
+      } else {
+        fallback += `🟢 You have ${fbLeave} min before you need to leave. Next bus at ${fmtTime(fb.etaMins)} (${fb.status}, ${fb.confidence}% confident). ${buses[1] ? `Backup: ${fmtTime(buses[1].etaMins)}.` : ""}`;
+      }
+      setAiMessages([...newHistory, { role: "assistant", content: fallback }]);
     }
     setAiLoading(false);
   };

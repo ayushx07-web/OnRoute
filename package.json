@@ -4,6 +4,8 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "dev:proxy": "node scripts/dev-proxy.js",
+    "dev:full": "concurrently \"npm run dev\" \"npm run dev:proxy\"",
     "build": "vite build",
     "preview": "vite preview"
   },
@@ -15,6 +17,10 @@
     "@types/react": "^18.3.1",
     "@types/react-dom": "^18.3.1",
     "@vitejs/plugin-react": "^4.3.1",
+    "concurrently": "^9.1.0",
+    "dotenv": "^16.4.5",
+    "node-fetch": "^3.3.2",
     "vite": "^5.4.10"
   }
 }
+
