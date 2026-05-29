@@ -12,6 +12,8 @@ OnRoute is a real-time Delhi bus tracker and AI-powered commute advisor. It tell
 
 ## 🚀 Live Demo
 
+🔗 **[https://on-route-five.vercel.app](https://on-route-five.vercel.app)**
+
 **Demo Mode built-in** → Click `DEMO` in the app header to load Priya's scenario:
 - Route: DTC 534 (Dwarka Sec-10 → Connaught Place)
 - Time: 8:15 AM rush hour
@@ -42,7 +44,7 @@ Not just displaying data — **actually predicting delays**:
 
 - **React 18** — UI framework
 - **Vite 5** — dev server & build tool
-- **Anthropic Claude API** — AI commute advisor
+- **Groq + Llama 3.3 70B** — AI commute advisor (free tier)
 - **Vanilla CSS-in-JS** — zero dependencies for styling
 
 ## 🛠️ Run Locally
